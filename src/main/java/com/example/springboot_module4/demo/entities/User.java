@@ -12,7 +12,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class User implements UserDetails {
+@Entity @Table(name = "users") @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class User
+        implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
 

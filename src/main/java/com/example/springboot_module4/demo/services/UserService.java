@@ -11,12 +11,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service @NoArgsConstructor @AllArgsConstructor public class UserService implements UserDetailsService {
-
-    private UserRepository userRepository;
-
-    @Override public UserDetails loadUserByUsername(String username) {
-        return this.userRepository.findByEmail(username).orElseThrow(
-                () -> new ResourceNotFoundException("could not find any user with specified name"));
-    }
-}
+//@Service @NoArgsConstructor @AllArgsConstructor public class UserService implements UserDetailsService {
+//
+//    private UserRepository userRepository;
+//
+//    @Override public UserDetails loadUserByUsername(String username) {
+//        return this.userRepository.findByEmail(username).orElseThrow(
+//                () -> new ResourceNotFoundException("could not find any user with specified name"));
+//    }
+//}

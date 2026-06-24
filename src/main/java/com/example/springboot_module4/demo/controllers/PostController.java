@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController @RequestMapping(path = "/post") public class PostController {
-    //rest controller bascially tells us that this class is going to handle
+    //    rest controller basically tells us that this class is going to handle
     //    the api responses also the output to called will be in format json/xml
 
     private final PostService postService;
@@ -18,6 +18,8 @@ import java.util.List;
     }
 
     @GetMapping(path = "/getAllPosts") public List<PostDTO> getAllPosts() {
+
+        System.out.println("we are debugging here");
         return this.postService.findAllPosts();
     }
 
