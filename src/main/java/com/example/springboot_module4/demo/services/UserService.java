@@ -29,7 +29,7 @@ import java.util.Optional;
     @Override public UserDetails loadUserByUsername(String username) {
         return this.userRepository
                 .findByEmail(username)
-                .orElseThrow(() -> new ResourceNotFoundException("could not find any user with specified name"));
+                .orElseThrow(() -> new BadCredentialsException("could not find any user with these credentials"));
     }
 
     public User getUserById(Long userId) {
