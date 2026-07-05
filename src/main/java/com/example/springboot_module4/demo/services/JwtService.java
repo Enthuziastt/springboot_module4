@@ -1,0 +1,47 @@
+package com.example.springboot_module4.demo.services;
+
+
+import com.example.springboot_module4.demo.entities.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.Set;
+
+@Service public class JwtService {
+
+    @Value("${jwt.secretKey}") private String secretKey;
+
+    //    we need to write a function that returns the secret key
+    public SecretKey getSecretKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
+
+
+    //    now we are going to write a function for generating the token
+    public String generateToken(User user) {
+        return Jwts
+                .builder()
+                .subject(user.getId().toString())
+                .claim("email", user.getEmail())
+                .claim("roles", Set.of("ADMIN", "USER"))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 3600))
+                .signWith(getSecretKey())
+                .compact();
+    }
+
+    //    this is going to be the method to get user from the token
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).getPayload();
+
+        //        returning only the subject
+        return Long.valueOf(claims.getSubject());
+    }
+
+}

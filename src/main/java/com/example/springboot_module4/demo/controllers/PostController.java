@@ -18,8 +18,6 @@ import java.util.List;
     }
 
     @GetMapping(path = "/getAllPosts") public List<PostDTO> getAllPosts() {
-
-        System.out.println("we are debugging here");
         return this.postService.findAllPosts();
     }
 
