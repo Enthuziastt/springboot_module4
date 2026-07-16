@@ -1,10 +1,7 @@
 package com.example.springboot_module4.demo.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,13 +9,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity @Table(name = "users") @NoArgsConstructor @AllArgsConstructor @Getter @Setter public class User
+@Entity @Table(name = "users") @NoArgsConstructor @AllArgsConstructor @Getter @Setter @Builder public class User
         implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
-
     @Column(nullable = false) private String email;
     private String password;
+    private String name;
 
 
     @Override public Collection<? extends GrantedAuthority> getAuthorities() {

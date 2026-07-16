@@ -1,5 +1,6 @@
 package com.example.springboot_module4.demo.services;
 
+import com.example.springboot_module4.demo.DTO.LoginResponseDto;
 import com.example.springboot_module4.demo.DTO.UserDto;
 import com.example.springboot_module4.demo.DTO.UserLoginDto;
 import com.example.springboot_module4.demo.DTO.UserSignUpDto;
@@ -15,17 +16,30 @@ import org.springframework.stereotype.Service;
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final UserService userService;
 
-    public String login(UserLoginDto userLoginDto) {
+    public LoginResponseDto login(UserLoginDto userLoginDto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(), userLoginDto.getPassword()));
 
         User authenticatedUser = (User) authentication.getPrincipal();
 
         if (authenticatedUser != null) {
-            return jwtService.generateToken(authenticatedUser);
+
+            String accessToken = jwtService.generateAccessToken(authenticatedUser);
+            String refreshToken = jwtService.generateRefreshToken(authenticatedUser);
+            return new LoginResponseDto(authenticatedUser.getId(), accessToken, refreshToken);
         } else {
             throw new BadCredentialsException("user could not be authenticated");
         }
+    }
+
+    public LoginResponseDto refreshRequest(String refreshToken) {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+
+        User user = userService.getUserById(userId);
+        String accessToken = jwtService.generateAccessToken(user);
+        return new LoginResponseDto(userId, accessToken, refreshToken);
+
     }
 }

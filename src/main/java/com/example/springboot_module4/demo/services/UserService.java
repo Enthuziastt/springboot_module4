@@ -51,5 +51,12 @@ import java.util.Optional;
         return modelMapper.map(savedUser, UserDto.class);
     }
 
+    public User getUserByEmail(String email) {
+        return this.userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User saveWithoutPassword(User user) {
+        return this.userRepository.save(user);
+    }
 
 }
