@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserService userService;
+    private final SessionService sessionService;
 
     public LoginResponseDto login(UserLoginDto userLoginDto) {
         Authentication authentication = authenticationManager.authenticate(
@@ -28,6 +29,10 @@ import org.springframework.stereotype.Service;
 
             String accessToken = jwtService.generateAccessToken(authenticatedUser);
             String refreshToken = jwtService.generateRefreshToken(authenticatedUser);
+
+            //            storing a new session here too
+            sessionService.generateNewSession(authenticatedUser, refreshToken);
+
             return new LoginResponseDto(authenticatedUser.getId(), accessToken, refreshToken);
         } else {
             throw new BadCredentialsException("user could not be authenticated");
@@ -36,8 +41,10 @@ import org.springframework.stereotype.Service;
 
     public LoginResponseDto refreshRequest(String refreshToken) {
         Long userId = jwtService.getUserIdFromToken(refreshToken);
-
         User user = userService.getUserById(userId);
+        //        before granting another access token, we must check if the access token is valid or not
+        sessionService.validateSession(refreshToken);
+
         String accessToken = jwtService.generateAccessToken(user);
         return new LoginResponseDto(userId, accessToken, refreshToken);
 

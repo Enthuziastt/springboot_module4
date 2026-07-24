@@ -64,10 +64,6 @@ import java.util.Arrays;
         return ResponseEntity.ok(responseDto);
 
 
-        //        returned jwt: eyJhbGciOiJIUzI1NiJ9
-        //        .eyJzdWIiOiIxIiwiZW1haWwiOiJwcmFiaGF0dHlhZ2kxNTAzMjAwMUBnbWFpbC5jb20iLCJyb2xlcyI6WyJVU0VSIiwiQURNSU4iX
-        //        SwiaWF0IjoxNzg0MjA0MjkzLCJleHAiOjE3ODQyMDQ4OTN9.wdBHI3z204HvLkRR4YzzqgNR7kOHtVrQYjUqI5pf92Y
-
     }
 
 }
