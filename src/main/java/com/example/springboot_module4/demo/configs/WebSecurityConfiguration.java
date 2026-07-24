@@ -6,6 +6,7 @@ import com.example.springboot_module4.demo.controllers.authFilter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,6 +24,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.net.http.HttpRequest;
+import java.util.List;
+
+import static com.example.springboot_module4.demo.entities.enums.Role.ADMIN;
+import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
+
 @Configuration @EnableWebSecurity
 // with the help of this annotation, am able to tell
 // spring that i am going to provide back the SecurityFilterChain Object it expects
@@ -31,21 +38,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    //    this is a configuration class, and it returns a password encoder
-
-    //    @Bean UserDetailsService userDetailsServiceProvider() {
-    //        UserDetails user1 = User
-    //                .withUsername("prabhat")
-    //                .password(passwordEncoder().encode("Prabhat@123"))
-    //                .authorities("ADMIN")
-    //                .build();
-    //
-    //        UserDetails user2 =
-    //                User.withUsername("aman").password(passwordEncoder().encode("Aman@123")).authorities("USER")
-    //                .build();
-    //
-    //        return new InMemoryUserDetailsManager(user1, user2);
-    //    }
+    private final String[] publicRoutes = {"/error", "/auth/**", "/home.html"};
 
     @Bean AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
@@ -53,11 +46,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
     @Bean SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(
-                        auth -> auth.requestMatchers("/post", "/error", "/auth/**", "/home.html").permitAll()
-                                    //                        .requestMatchers("/getAllPosts/**")
-                                    //                        .hasAnyRole("ADMIN")
-                                    .anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(publicRoutes)
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/post/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/post/**")
+                        .hasAnyRole(ADMIN.name(), CREATOR.name())
+                        .anyRequest()
+                        .authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2Login(
                         oAuthConfig -> oAuthConfig.failureUrl("/login?error=true").successHandler(oAuth2SuccessHandler))

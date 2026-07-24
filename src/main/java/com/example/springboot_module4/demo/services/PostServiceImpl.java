@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
 
-    public PostServiceImpl(PostRepository postRepository,
-                           ModelMapper modelMapper) {
+    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper) {
+
         this.postRepository = postRepository;
         this.modelMapper = modelMapper;
         //        this is an illustration of constructor injection
@@ -30,21 +30,24 @@ import java.util.stream.Collectors;
 
     @Override public List<PostDTO> findAllPosts() {
 
-        return this.postRepository.findAll().stream().map(postEntity -> this.modelMapper.map(postEntity, PostDTO.class))
-                                  .collect(Collectors.toList());
+        return this.postRepository
+                .findAll()
+                .stream()
+                .map(postEntity -> this.modelMapper.map(postEntity, PostDTO.class))
+                .collect(Collectors.toList());
 
     }
 
     @Override public PostDTO findPostById(Long postId) {
-        return this.modelMapper.map(this.postRepository.findById(postId).orElseThrow(
-                () -> new ResourceNotFoundException("could not find the post with this id")), PostDTO.class);
+        return this.modelMapper.map(this.postRepository
+                                            .findById(postId)
+                                            .orElseThrow(() -> new ResourceNotFoundException(
+                                                    "could not find the post with this id")), PostDTO.class);
     }
 
     @Override public PostDTO savePost(PostDTO inputPost) {
 
         return this.modelMapper.map(this.postRepository.save(this.modelMapper.map(inputPost, PostEntity.class)),
                                     PostDTO.class);
-        //        so this is going to first convert post dto -> entity
-        //        and get back entity -> map it back to DTO
     }
 }
