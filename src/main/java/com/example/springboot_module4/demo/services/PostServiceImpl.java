@@ -2,12 +2,15 @@ package com.example.springboot_module4.demo.services;
 
 import com.example.springboot_module4.demo.DTO.PostDTO;
 import com.example.springboot_module4.demo.entities.PostEntity;
+import com.example.springboot_module4.demo.entities.User;
 import com.example.springboot_module4.demo.exceptions.ResourceNotFoundException;
 import com.example.springboot_module4.demo.repositories.PostRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -47,7 +50,11 @@ import java.util.stream.Collectors;
 
     @Override public PostDTO savePost(PostDTO inputPost) {
 
-        return this.modelMapper.map(this.postRepository.save(this.modelMapper.map(inputPost, PostEntity.class)),
-                                    PostDTO.class);
+        //        we want to fetch the user from the context and save the post with its name
+        User currentUser =
+                (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+        PostEntity postEntity = modelMapper.map(inputPost, PostEntity.class);
+        postEntity.setAuthor(currentUser);
+        return this.modelMapper.map(postRepository.save(postEntity), PostDTO.class);
     }
 }

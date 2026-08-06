@@ -1,5 +1,6 @@
 package com.example.springboot_module4.demo.DTO;
 
+import com.example.springboot_module4.demo.entities.User;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,4 +14,5 @@ import lombok.NoArgsConstructor;
 
     private String name;
     private String description;
+    private UserDto author;
 }

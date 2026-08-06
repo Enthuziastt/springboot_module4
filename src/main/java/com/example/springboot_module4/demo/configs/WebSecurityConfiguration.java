@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,10 +35,8 @@ import static com.example.springboot_module4.demo.entities.enums.Permission.POST
 import static com.example.springboot_module4.demo.entities.enums.Role.ADMIN;
 import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
 
-@Configuration @EnableWebSecurity
-// with the help of this annotation, am able to tell
-// spring that i am going to provide back the SecurityFilterChain Object it expects
-@RequiredArgsConstructor @Slf4j public class WebSecurityConfiguration {
+@Configuration @EnableWebSecurity @EnableMethodSecurity(securedEnabled = true) @RequiredArgsConstructor @Slf4j
+public class WebSecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -53,10 +52,8 @@ import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(publicRoutes)
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/post/**")
-                        .hasAuthority(POST_VIEW.name())
-                        .requestMatchers(HttpMethod.POST, "/post/**")
-                        .hasAnyRole(ADMIN.name(), CREATOR.name())
+                        .requestMatchers("/post/**")
+                        .authenticated()
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
@@ -72,5 +69,7 @@ import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
 }
 
 //    "userId": 1,
-//            "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJuZWhhLnZlcm1hQGV4YW1wbGUuY29tIiwicm9sZXMiOiJbVVNFUl0iLCJpYXQiOjE3ODU4NTI2MTMsImV4cCI6MTc4NTg1MzIxM30.oECwBXep81yHnwNPHpnrpRgtIFeBKynZvNbRbz2SN70",
-//            "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzg1ODUyNjEzLCJleHAiOjE4MDE0MDQ2MTN9.SAn3m_Ek3pnfhTeoj-_KR_aXyX9O0yR4f3Hb43paSyo"
+//            "accessToken": "eyJhbGciOiJIUzI1NiJ9
+//            .eyJzdWIiOiIxIiwiZW1haWwiOiJuZWhhLnZlcm1hQGV4YW1wbGUuY29tIiwicm9sZXMiOiJbVVNFUl0iLCJpYXQiOjE3ODU4NTI2MTMsImV4cCI6MTc4NTg1MzIxM30.oECwBXep81yHnwNPHpnrpRgtIFeBKynZvNbRbz2SN70",
+//            "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzg1ODUyNjEzLCJleHAiOjE4MDE0MDQ2MTN9
+//            .SAn3m_Ek3pnfhTeoj-_KR_aXyX9O0yR4f3Hb43paSyo"

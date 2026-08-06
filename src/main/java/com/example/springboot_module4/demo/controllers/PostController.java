@@ -4,6 +4,8 @@ import com.example.springboot_module4.demo.DTO.PostDTO;
 import com.example.springboot_module4.demo.services.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -20,11 +22,12 @@ import java.util.List;
         this.postService = postService;
     }
 
-    @GetMapping(path = "/getAllPosts") public List<PostDTO> getAllPosts() {
+    @Secured({"ROLE_USER", "ROLE_ADMIN"}) @GetMapping(path = "/getAllPosts") public List<PostDTO> getAllPosts() {
         return this.postService.findAllPosts();
     }
 
-    @GetMapping(path = "/getPostById/{postId}") public PostDTO getPostById(@PathVariable Long postId) {
+    @PreAuthorize("@postSecurity.isOwnerOfPost(#postId)") @GetMapping(path = "/getPostById/{postId}")
+    public PostDTO getPostById(@PathVariable Long postId) {
         return this.postService.findPostById(postId);
     }
 
