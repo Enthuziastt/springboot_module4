@@ -4,6 +4,7 @@ package com.example.springboot_module4.demo.configs;
 import com.example.springboot_module4.demo.controllers.SuccessHandlers.OAuth2SuccessHandler;
 import com.example.springboot_module4.demo.controllers.authFilter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,18 +30,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.net.http.HttpRequest;
 import java.util.List;
 
+import static com.example.springboot_module4.demo.entities.enums.Permission.POST_VIEW;
 import static com.example.springboot_module4.demo.entities.enums.Role.ADMIN;
 import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
 
 @Configuration @EnableWebSecurity
 // with the help of this annotation, am able to tell
 // spring that i am going to provide back the SecurityFilterChain Object it expects
-@RequiredArgsConstructor public class WebSecurityConfiguration {
+@RequiredArgsConstructor @Slf4j public class WebSecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    private final String[] publicRoutes = {"/error", "/auth/**", "/home.html"};
+    private final String[] publicRoutes = {"/auth/**", "/home.html"};
 
     @Bean AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
@@ -50,7 +54,7 @@ import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
                         .requestMatchers(publicRoutes)
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/post/**")
-                        .permitAll()
+                        .hasAuthority(POST_VIEW.name())
                         .requestMatchers(HttpMethod.POST, "/post/**")
                         .hasAnyRole(ADMIN.name(), CREATOR.name())
                         .anyRequest()
@@ -62,8 +66,11 @@ import static com.example.springboot_module4.demo.entities.enums.Role.CREATOR;
 
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
         return http.build();
     }
 
 }
+
+//    "userId": 1,
+//            "accessToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJuZWhhLnZlcm1hQGV4YW1wbGUuY29tIiwicm9sZXMiOiJbVVNFUl0iLCJpYXQiOjE3ODU4NTI2MTMsImV4cCI6MTc4NTg1MzIxM30.oECwBXep81yHnwNPHpnrpRgtIFeBKynZvNbRbz2SN70",
+//            "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzg1ODUyNjEzLCJleHAiOjE4MDE0MDQ2MTN9.SAn3m_Ek3pnfhTeoj-_KR_aXyX9O0yR4f3Hb43paSyo"

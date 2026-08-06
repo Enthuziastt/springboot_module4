@@ -9,9 +9,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
-@Component @RequiredArgsConstructor public class JwtAuthFilter extends OncePerRequestFilter {
+@Component @RequiredArgsConstructor @Slf4j public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final UserService userService;
     private final JwtService jwtService;
@@ -45,14 +47,14 @@ import java.io.IOException;
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                log.info("Before continuing chain, context has authentication: {}",
+                         SecurityContextHolder.getContext().getAuthentication());
                 filterChain.doFilter(request, response);
+
             }
         } catch (JwtException exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);
-
-            //            handler exception resolver is the one that redirects the exception caught inside the
-            //            context filter chain
-            //            lives in onto the one dispatcher servlet( controllers) lives in
         }
     }
 }

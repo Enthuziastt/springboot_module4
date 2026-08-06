@@ -62,8 +62,6 @@ import java.util.Arrays;
                 .orElseThrow(() -> new AuthenticationServiceException("refreshToken not found inside the Cookies"));
         LoginResponseDto responseDto = authService.refreshRequest(refreshToken);
         return ResponseEntity.ok(responseDto);
-
-
     }
 
 }
